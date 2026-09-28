@@ -1,6 +1,7 @@
 package com.shineaungkhant.portfolio.project;
 
 import com.shineaungkhant.portfolio.common.Clean;
+import com.shineaungkhant.portfolio.common.Links;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -149,8 +150,8 @@ public class Project {
     outcome = Clean.text(request.outcome());
     points = Clean.list(request.points());
     stack = Clean.list(request.stack());
-    appStore = Clean.text(request.appStore());
-    playStore = Clean.text(request.playStore());
+    appStore = Links.optionalHttps(request.appStore());
+    playStore = Links.optionalHttps(request.playStore());
     featured = Boolean.TRUE.equals(request.featured());
   }
 }

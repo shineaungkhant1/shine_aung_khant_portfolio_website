@@ -1,5 +1,6 @@
 package com.shineaungkhant.portfolio.common;
 
+import com.shineaungkhant.portfolio.auth.AuthRejectedException;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(AuthRejectedException.class)
+  ResponseEntity<Map<String, String>> unauthorized(AuthRejectedException exception) {
+    return ResponseEntity.status(401).body(Map.of("error", exception.getMessage()));
+  }
 
   @ExceptionHandler(NotFoundException.class)
   ResponseEntity<Map<String, String>> notFound(NotFoundException exception) {

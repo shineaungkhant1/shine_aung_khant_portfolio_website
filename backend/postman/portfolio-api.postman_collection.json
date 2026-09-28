@@ -1,0 +1,585 @@
+{
+  "info": {
+    "name": "Portfolio API",
+    "description": "Shine Aung Khant portfolio API.\n\nSet baseUrl to http://localhost:8080 for local, or to the Render URL (no /api on the end).\nusername is admin. password is changeme locally, and the Render ADMIN_PASSWORD in production.\n\nLogin with a deviceId. A new login replaces the previous device. Use the saved accessToken as Bearer auth, or keep using Basic auth for writes. Refresh rotates the refresh token. Logout revokes the session.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "username", "value": "admin" },
+    { "key": "password", "value": "changeme" },
+    { "key": "projectSlug", "value": "saytaman" },
+    { "key": "experienceId", "value": "1" },
+    { "key": "educationId", "value": "1" },
+    { "key": "certificationId", "value": "1" },
+    { "key": "deviceId", "value": "postman-device-1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{username}}", "type": "string" },
+      { "key": "password", "value": "{{password}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.accessToken) pm.collectionVariables.set('accessToken', body.accessToken);",
+                  "if (body.refreshToken) pm.collectionVariables.set('refreshToken', body.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"deviceId\": \"{{deviceId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "No Basic auth. 200 returns accessToken (15 minutes) and refreshToken (14 days). Logging in again, even with another deviceId, signs out the previous device."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/auth/login" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.signature\",\n  \"refreshToken\": \"example-refresh-token\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 900\n}"
+            },
+            {
+              "name": "401 Unauthorized",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/auth/login" },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Unauthorized\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.accessToken) pm.collectionVariables.set('accessToken', body.accessToken);",
+                  "if (body.refreshToken) pm.collectionVariables.set('refreshToken', body.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\",\n  \"deviceId\": \"{{deviceId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/refresh",
+            "description": "Same deviceId as login. The previous refreshToken stops working. A different deviceId returns 401."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/auth/refresh" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.signature\",\n  \"refreshToken\": \"new-refresh-token\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 900\n}"
+            }
+          ]
+        },
+        {
+          "name": "Current session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/session",
+            "description": "Requires the access token. 401 after logout or after a login from another device."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/auth/session" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"username\": \"admin\",\n  \"deviceId\": \"postman-device-1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "204 and no body. The refresh token and access token for that device stop working."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/auth/logout" },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/profile"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/profile" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Shine Aung Khant\",\n  \"role\": \"Flutter developer\",\n  \"location\": \"Ho Chi Minh City\",\n  \"origin\": \"Yangon, Myanmar\",\n  \"email\": \"shineaungkhant1@gmail.com\",\n  \"emailHref\": \"https://mail.google.com/mail/?view=cm&fs=1&to=shineaungkhant1@gmail.com\",\n  \"phone\": \"+84 38 440 1005\",\n  \"phoneHref\": \"tel:+84384401005\",\n  \"linkedin\": \"https://www.linkedin.com/in/shine-aung-khant/\",\n  \"github\": \"https://github.com/shineaungkhant1\",\n  \"resume\": \"/Shine-Aung-Khant-Resume.pdf\",\n  \"summary\": \"Mid-level Flutter developer shipping Android and iOS apps for streaming, commerce, and education.\"\n}"
+            },
+            {
+              "name": "401 Unauthorized",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/profile" },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-09-28T14:50:00.000+00:00\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"path\": \"/api/profile\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Shine Aung Khant\",\n  \"role\": \"Flutter developer\",\n  \"location\": \"Ho Chi Minh City\",\n  \"origin\": \"Yangon, Myanmar\",\n  \"email\": \"shineaungkhant1@gmail.com\",\n  \"emailHref\": \"https://mail.google.com/mail/?view=cm&fs=1&to=shineaungkhant1@gmail.com\",\n  \"phone\": \"+84 38 440 1005\",\n  \"phoneHref\": \"tel:+84384401005\",\n  \"linkedin\": \"https://www.linkedin.com/in/shine-aung-khant/\",\n  \"github\": \"https://github.com/shineaungkhant1\",\n  \"resume\": \"/Shine-Aung-Khant-Resume.pdf\",\n  \"summary\": \"Mid-level Flutter developer shipping Android and iOS apps.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/profile"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/profile" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Shine Aung Khant\",\n  \"role\": \"Flutter developer\",\n  \"location\": \"Ho Chi Minh City\",\n  \"origin\": \"Yangon, Myanmar\",\n  \"email\": \"shineaungkhant1@gmail.com\",\n  \"emailHref\": \"https://mail.google.com/mail/?view=cm&fs=1&to=shineaungkhant1@gmail.com\",\n  \"phone\": \"+84 38 440 1005\",\n  \"phoneHref\": \"tel:+84384401005\",\n  \"linkedin\": \"https://www.linkedin.com/in/shine-aung-khant/\",\n  \"github\": \"https://github.com/shineaungkhant1\",\n  \"resume\": \"/Shine-Aung-Khant-Resume.pdf\",\n  \"summary\": \"Mid-level Flutter developer shipping Android and iOS apps.\"\n}"
+            },
+            {
+              "name": "400 name must not be blank",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/profile" },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"name must not be blank\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List projects",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/projects" },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/projects" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"slug\": \"saytaman\",\n    \"name\": \"SAYTAMAN\",\n    \"category\": \"Streaming\",\n    \"org\": \"AXRA Tech\",\n    \"period\": \"Jul 2025 — Present\",\n    \"summary\": \"A movie and live streaming app for Myanmar and international films.\",\n    \"outcome\": \"Active user retention rose 48% after launch.\",\n    \"points\": [\n      \"Owned the Flutter app from architecture through App Store and Play Store release.\"\n    ],\n    \"stack\": [\"Flutter\", \"Dart\", \"BLoC\"],\n    \"appStore\": \"https://apps.apple.com/app/saytaman/id6758314311\",\n    \"playStore\": \"https://play.google.com/store/apps/details?id=com.saytaman.say_ta_man\",\n    \"featured\": true,\n    \"sortOrder\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get project",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/projects/{{projectSlug}}" },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/projects/saytaman" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"slug\": \"saytaman\",\n  \"name\": \"SAYTAMAN\",\n  \"category\": \"Streaming\",\n  \"org\": \"AXRA Tech\",\n  \"period\": \"Jul 2025 — Present\",\n  \"summary\": \"A movie and live streaming app for Myanmar and international films.\",\n  \"outcome\": \"Active user retention rose 48% after launch.\",\n  \"points\": [\n    \"Owned the Flutter app from architecture through App Store and Play Store release.\"\n  ],\n  \"stack\": [\"Flutter\", \"Dart\", \"BLoC\"],\n  \"appStore\": \"https://apps.apple.com/app/saytaman/id6758314311\",\n  \"playStore\": \"https://play.google.com/store/apps/details?id=com.saytaman.say_ta_man\",\n  \"featured\": true,\n  \"sortOrder\": 0\n}"
+            },
+            {
+              "name": "404 Project not found",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/projects/missing" },
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Project not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slug\": \"folder-check\",\n  \"name\": \"Folder Check\",\n  \"category\": \"Education\",\n  \"org\": \"Personal\",\n  \"period\": \"2026\",\n  \"summary\": \"A sample project created from Postman.\",\n  \"outcome\": \"Confirms the write API.\",\n  \"points\": [\"Created from the admin API.\"],\n  \"stack\": [\"Flutter\"],\n  \"featured\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/projects"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/projects" },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 18,\n  \"slug\": \"folder-check\",\n  \"name\": \"Folder Check\",\n  \"category\": \"Education\",\n  \"org\": \"Personal\",\n  \"period\": \"2026\",\n  \"summary\": \"A sample project created from Postman.\",\n  \"outcome\": \"Confirms the write API.\",\n  \"points\": [\"Created from the admin API.\"],\n  \"stack\": [\"Flutter\"],\n  \"featured\": false,\n  \"sortOrder\": 17\n}"
+            },
+            {
+              "name": "400 bad category",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/projects" },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Category must be Streaming, Commerce, Education, or Delivery\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update project",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SAYTAMAN\",\n  \"category\": \"Streaming\",\n  \"org\": \"AXRA Tech\",\n  \"period\": \"Jul 2025 — Present\",\n  \"summary\": \"A movie and live streaming app.\",\n  \"points\": [\"Owned the Flutter app.\"],\n  \"stack\": [\"Flutter\", \"Dart\"],\n  \"featured\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/projects/{{projectSlug}}"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/projects/saytaman" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"slug\": \"saytaman\",\n  \"name\": \"SAYTAMAN\",\n  \"category\": \"Streaming\",\n  \"org\": \"AXRA Tech\",\n  \"period\": \"Jul 2025 — Present\",\n  \"summary\": \"A movie and live streaming app.\",\n  \"points\": [\"Owned the Flutter app.\"],\n  \"stack\": [\"Flutter\", \"Dart\"],\n  \"featured\": true,\n  \"sortOrder\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete project",
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/projects/{{projectSlug}}" },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/projects/folder-check" },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Experience",
+      "item": [
+        {
+          "name": "List experience",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/experience" },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/experience" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"role\": \"Flutter Developer\",\n    \"org\": \"AXRA Tech\",\n    \"place\": \"Ho Chi Minh City\",\n    \"period\": \"Jul 2025 — Present\",\n    \"points\": [\"Ship Android and iOS apps for streaming and commerce.\"],\n    \"sortOrder\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create experience",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Flutter Developer\",\n  \"org\": \"AXRA Tech\",\n  \"place\": \"Ho Chi Minh City\",\n  \"period\": \"Jul 2025 — Present\",\n  \"points\": [\"Ship Android and iOS apps for streaming and commerce.\"]\n}"
+            },
+            "url": "{{baseUrl}}/api/experience"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/experience" },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 6,\n  \"role\": \"Flutter Developer\",\n  \"org\": \"AXRA Tech\",\n  \"place\": \"Ho Chi Minh City\",\n  \"period\": \"Jul 2025 — Present\",\n  \"points\": [\"Ship Android and iOS apps for streaming and commerce.\"],\n  \"sortOrder\": 5\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update experience",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Flutter Developer\",\n  \"org\": \"AXRA Tech\",\n  \"place\": \"Ho Chi Minh City\",\n  \"period\": \"Jul 2025 — Present\",\n  \"points\": [\"Ship Android and iOS apps.\"]\n}"
+            },
+            "url": "{{baseUrl}}/api/experience/{{experienceId}}"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/experience/1" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"role\": \"Flutter Developer\",\n  \"org\": \"AXRA Tech\",\n  \"place\": \"Ho Chi Minh City\",\n  \"period\": \"Jul 2025 — Present\",\n  \"points\": [\"Ship Android and iOS apps.\"],\n  \"sortOrder\": 0\n}"
+            },
+            {
+              "name": "404 Experience not found",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/experience/999" },
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Experience not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete experience",
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/experience/{{experienceId}}" },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/experience/1" },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Education",
+      "item": [
+        {
+          "name": "List education",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/education" },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/education" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Bachelor of Engineering\",\n    \"org\": \"University\",\n    \"period\": \"2018 — 2023\",\n    \"sortOrder\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create education",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bachelor of Engineering\",\n  \"org\": \"University\",\n  \"period\": \"2018 — 2023\"\n}"
+            },
+            "url": "{{baseUrl}}/api/education"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/education" },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 4,\n  \"title\": \"Bachelor of Engineering\",\n  \"org\": \"University\",\n  \"period\": \"2018 — 2023\",\n  \"sortOrder\": 3\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update education",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bachelor of Engineering\",\n  \"org\": \"University\",\n  \"period\": \"2018 — 2023\"\n}"
+            },
+            "url": "{{baseUrl}}/api/education/{{educationId}}"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/education/1" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Bachelor of Engineering\",\n  \"org\": \"University\",\n  \"period\": \"2018 — 2023\",\n  \"sortOrder\": 0\n}"
+            },
+            {
+              "name": "404 Education not found",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/education/999" },
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Education not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete education",
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/education/{{educationId}}" },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/education/1" },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Certifications",
+      "item": [
+        {
+          "name": "List certifications",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/certifications" },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/certifications" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Flutter Certification\",\n    \"href\": \"https://example.com/certificate\",\n    \"sortOrder\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create certification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Flutter Certification\",\n  \"href\": \"https://example.com/certificate\"\n}"
+            },
+            "url": "{{baseUrl}}/api/certifications"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/certifications" },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 5,\n  \"title\": \"Flutter Certification\",\n  \"href\": \"https://example.com/certificate\",\n  \"sortOrder\": 4\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update certification",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Flutter Certification\",\n  \"href\": \"https://example.com/certificate\"\n}"
+            },
+            "url": "{{baseUrl}}/api/certifications/{{certificationId}}"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/certifications/1" },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"title\": \"Flutter Certification\",\n  \"href\": \"https://example.com/certificate\",\n  \"sortOrder\": 0\n}"
+            },
+            {
+              "name": "404 Certification not found",
+              "originalRequest": { "method": "PUT", "header": [], "url": "{{baseUrl}}/api/certifications/999" },
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"error\": \"Certification not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete certification",
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/certifications/{{certificationId}}" },
+          "response": [
+            {
+              "name": "204 No Content",
+              "originalRequest": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/certifications/1" },
+              "status": "No Content",
+              "code": 204,
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

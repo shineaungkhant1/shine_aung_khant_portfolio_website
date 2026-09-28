@@ -1,4 +1,5 @@
 import "server-only";
+import { readAccessToken } from "@/lib/admin-session";
 import type { CertificationItem, EducationItem, ExperienceItem, Profile, Project } from "@/lib/data";
 
 export class ApiError extends Error {
@@ -18,23 +19,22 @@ function base() {
   return url;
 }
 
-function authorization() {
-  const username = process.env.API_USERNAME ?? "admin";
-  const password = process.env.API_PASSWORD ?? (process.env.NODE_ENV === "production" ? "" : "changeme");
-  if (!password) {
-    throw new ApiError("Set API_PASSWORD so the admin can call the API.");
+async function authorization() {
+  const access = await readAccessToken();
+  if (!access) {
+    throw new ApiError("Unauthorized", 401);
   }
-  return `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`;
+  return `Bearer ${access}`;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, authenticated = true): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${base()}${path}`, {
       ...init,
       cache: "no-store",
       headers: {
-        Authorization: authorization(),
+        ...(authenticated ? { Authorization: await authorization() } : {}),
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
         ...init?.headers,
       },
@@ -57,6 +57,10 @@ export function apiGet<T>(path: string) {
 
 export function apiSend<T>(path: string, method: "POST" | "PUT", body: unknown) {
   return request<T>(path, { method, body: JSON.stringify(body) });
+}
+
+export function apiPublic<T>(path: string, method: "POST", body: unknown) {
+  return request<T>(path, { method, body: JSON.stringify(body) }, false);
 }
 
 export function apiDelete(path: string) {

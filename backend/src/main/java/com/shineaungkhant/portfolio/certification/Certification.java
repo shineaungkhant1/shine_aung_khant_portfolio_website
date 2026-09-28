@@ -1,6 +1,7 @@
 package com.shineaungkhant.portfolio.certification;
 
 import com.shineaungkhant.portfolio.common.Clean;
+import com.shineaungkhant.portfolio.common.Links;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,6 +48,6 @@ public class Certification {
 
   public void apply(CertificationRequest request) {
     title = Clean.required(request.title());
-    href = Clean.required(request.href());
+    href = Links.https(request.href());
   }
 }

@@ -9,6 +9,7 @@ function loginError(error: string) {
   if (error === "rate") return "Too many attempts. Try again in a few minutes.";
   if (error === "api") return "The API is not running.";
   if (error === "config") return "Sign-in is not configured.";
+  if (error === "session") return "This account is signed in on another device.";
   return "That password did not match.";
 }
 

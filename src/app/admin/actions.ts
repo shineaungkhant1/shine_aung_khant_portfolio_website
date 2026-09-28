@@ -1,15 +1,24 @@
 "use server";
 
-import { timingSafeEqual } from "node:crypto";
+import { headers } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
-import { adminPassword, clearAdminCookie, isAdmin, setAdminCookie } from "@/lib/admin-session";
-import { ApiError, apiDelete, apiSend, type ApiProject } from "@/lib/portfolio-api";
+import {
+  clearTokenCookies,
+  readDeviceId,
+  readRefreshToken,
+  setDeviceCookie,
+  setTokenCookies,
+  isAdmin,
+} from "@/lib/admin-session";
+import { loginAllowed, recordLoginFailure, recordLoginSuccess } from "@/lib/login-guard";
+import { ApiError, apiDelete, apiPublic, apiSend, type ApiProject } from "@/lib/portfolio-api";
 
-function same(input: string, expected: string) {
-  const actual = Buffer.from(input);
-  const wanted = Buffer.from(expected);
-  if (actual.length !== wanted.length) return false;
-  return timingSafeEqual(actual, wanted);
+async function loginClientKey() {
+  const headerStore = await headers();
+  const forwarded = headerStore.get("x-forwarded-for");
+  const first = forwarded?.split(",")[0]?.trim();
+  if (first) return first;
+  return headerStore.get("x-real-ip")?.trim() || "unknown";
 }
 
 function message(error: unknown) {
@@ -44,17 +53,43 @@ function lines(formData: FormData, name: string) {
 }
 
 export async function login(formData: FormData) {
-  const expected = adminPassword();
-  const password = text(formData, "password");
-  if (!expected || !same(password, expected)) {
-    redirect("/admin/login?error=1");
+  const key = await loginClientKey();
+  if (!loginAllowed(key)) {
+    redirect("/admin/login?error=rate");
   }
-  await setAdminCookie();
+  const password = text(formData, "password");
+  const deviceId = await readDeviceId();
+  try {
+    const tokens = await apiPublic<{ accessToken: string; refreshToken: string }>("/api/auth/login", "POST", {
+      username: process.env.API_USERNAME ?? "admin",
+      password,
+      deviceId,
+    });
+    await setDeviceCookie(deviceId);
+    await setTokenCookies(tokens.accessToken, tokens.refreshToken);
+  } catch (error) {
+    unstable_rethrow(error);
+    if (error instanceof ApiError && error.status === 429) {
+      redirect("/admin/login?error=rate");
+    }
+    if (error instanceof ApiError && error.status === 401) {
+      recordLoginFailure(key);
+      redirect("/admin/login?error=1");
+    }
+    redirect("/admin/login?error=api");
+  }
+  recordLoginSuccess(key);
   redirect("/admin");
 }
 
 export async function logout() {
-  await clearAdminCookie();
+  const refreshToken = await readRefreshToken();
+  try {
+    await apiPublic("/api/auth/logout", "POST", refreshToken ? { refreshToken } : {});
+  } catch {
+    // The local cookies are still cleared below.
+  }
+  await clearTokenCookies();
   redirect("/admin/login");
 }
 

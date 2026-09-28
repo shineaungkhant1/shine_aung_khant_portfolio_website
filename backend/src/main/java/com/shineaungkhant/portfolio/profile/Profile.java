@@ -1,6 +1,7 @@
 package com.shineaungkhant.portfolio.profile;
 
 import com.shineaungkhant.portfolio.common.Clean;
+import com.shineaungkhant.portfolio.common.Links;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -110,12 +111,12 @@ public class Profile {
     location = Clean.required(request.location());
     origin = Clean.required(request.origin());
     email = Clean.required(request.email());
-    emailHref = Clean.required(request.emailHref());
+    emailHref = Links.emailHref(request.emailHref());
     phone = Clean.required(request.phone());
-    phoneHref = Clean.required(request.phoneHref());
-    linkedin = Clean.required(request.linkedin());
-    github = Clean.required(request.github());
-    resume = Clean.required(request.resume());
+    phoneHref = Links.phoneHref(request.phoneHref());
+    linkedin = Links.https(request.linkedin());
+    github = Links.https(request.github());
+    resume = Links.resume(request.resume());
     summary = Clean.required(request.summary());
   }
 }
