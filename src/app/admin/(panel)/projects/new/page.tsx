@@ -1,5 +1,6 @@
 import { createProject } from "@/app/admin/actions";
 import { ProjectFields } from "@/components/admin/project-fields";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, primaryClass } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +20,9 @@ export default async function NewProjectPage({
       </div>
       <form action={createProject} className="mt-6 max-w-2xl">
         <ProjectFields />
-        <button className={`${primaryClass} mt-6`} type="submit">
+        <SubmitButton className={`${primaryClass} mt-6`} pendingLabel="Creating…">
           Create project
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

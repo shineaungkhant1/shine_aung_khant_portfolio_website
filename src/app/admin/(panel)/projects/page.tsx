@@ -29,6 +29,7 @@ export default async function ProjectsAdminPage({
       <div className="mt-4">
         <Notice saved={query.saved} error={query.error} />
       </div>
+      {projects.length === 0 ? <p className="mt-6 text-sm text-muted">No projects yet.</p> : null}
       <ul className="mt-6 divide-y divide-line border-y border-line">
         {projects.map((project) => (
           <li key={project.slug} className="flex items-center justify-between gap-4 py-4">

@@ -1,4 +1,5 @@
 import { saveProfile } from "@/app/admin/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, fieldClass, labelClass, primaryClass } from "@/components/admin/ui";
 import { ApiError, apiGet, type ApiProfile } from "@/lib/portfolio-api";
 
@@ -49,9 +50,9 @@ export default async function ProfileAdminPage({
           Summary
           <textarea className={fieldClass} name="summary" required rows={5} defaultValue={profile.summary} />
         </label>
-        <button className={primaryClass} type="submit">
+        <SubmitButton className={primaryClass} pendingLabel="Saving…">
           Save profile
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

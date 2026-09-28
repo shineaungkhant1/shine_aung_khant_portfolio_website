@@ -1,4 +1,5 @@
 import { createExperience, deleteExperience, updateExperience } from "@/app/admin/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
 import { ApiError, apiGet, type ApiExperience } from "@/lib/portfolio-api";
 
@@ -31,9 +32,9 @@ function ExperienceForm({ item, action, submit }: { item?: ApiExperience; action
         <textarea className={fieldClass} name="points" rows={4} defaultValue={item?.points.join("\n") ?? ""} placeholder="One point per line" />
       </label>
       <div className="flex flex-wrap gap-3">
-        <button className={item ? secondaryClass : primaryClass} type="submit">
+        <SubmitButton className={item ? secondaryClass : primaryClass} pendingLabel={item ? "Saving…" : "Adding…"}>
           {submit}
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );
@@ -66,9 +67,9 @@ export default async function ExperienceAdminPage({
             <ExperienceForm item={item} action={updateExperience} submit="Save role" />
             <form action={deleteExperience}>
               <input type="hidden" name="id" value={item.id} />
-              <button className={dangerClass} type="submit">
+              <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage={`Delete ${item.role}?`}>
                 Delete {item.role}
-              </button>
+              </SubmitButton>
             </form>
           </div>
         ))}

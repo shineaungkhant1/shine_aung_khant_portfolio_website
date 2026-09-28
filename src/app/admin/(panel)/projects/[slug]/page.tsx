@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { deleteProject, updateProject } from "@/app/admin/actions";
 import { ProjectFields } from "@/components/admin/project-fields";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, primaryClass } from "@/components/admin/ui";
 import { ApiError, apiGet, type ApiProject } from "@/lib/portfolio-api";
 
@@ -32,15 +33,15 @@ export default async function EditProjectPage({
       </div>
       <form action={updateProject} className="mt-6 max-w-2xl">
         <ProjectFields project={project} />
-        <button className={`${primaryClass} mt-6`} type="submit">
+        <SubmitButton className={`${primaryClass} mt-6`} pendingLabel="Saving…">
           Save project
-        </button>
+        </SubmitButton>
       </form>
       <form action={deleteProject} className="mt-4">
         <input type="hidden" name="slug" value={project.slug} />
-        <button className={dangerClass} type="submit">
+        <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this project?">
           Delete project
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

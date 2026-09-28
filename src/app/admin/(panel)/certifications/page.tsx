@@ -1,4 +1,5 @@
 import { createCertification, deleteCertification, updateCertification } from "@/app/admin/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
 import { ApiError, apiGet, type ApiCertification } from "@/lib/portfolio-api";
 
@@ -34,9 +35,9 @@ export default async function CertificationsAdminPage({
             Link
             <input className={fieldClass} name="href" required />
           </label>
-          <button className={primaryClass} type="submit">
+          <SubmitButton className={primaryClass} pendingLabel="Adding…">
             Add certificate
-          </button>
+          </SubmitButton>
         </form>
         {items.map((item) => (
           <div key={item.id} className="grid gap-3">
@@ -50,15 +51,15 @@ export default async function CertificationsAdminPage({
                 Link
                 <input className={fieldClass} name="href" required defaultValue={item.href} />
               </label>
-              <button className={secondaryClass} type="submit">
+              <SubmitButton className={secondaryClass} pendingLabel="Saving…">
                 Save
-              </button>
+              </SubmitButton>
             </form>
             <form action={deleteCertification}>
               <input type="hidden" name="id" value={item.id} />
-              <button className={dangerClass} type="submit">
+              <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this certificate?">
                 Delete
-              </button>
+              </SubmitButton>
             </form>
           </div>
         ))}

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BackgroundWash } from "@/components/background-wash";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { SubmitButton } from "@/components/admin/submit-button";
 import { logout } from "@/app/admin/actions";
 import { isAdmin } from "@/lib/admin-session";
 
@@ -31,20 +32,11 @@ export default async function AdminPanelLayout({ children }: { children: React.R
             <p className="text-xs tracking-[0.16em] text-muted uppercase">Admin</p>
             <p className="mt-1 font-serif text-2xl tracking-tight">Portfolio</p>
           </div>
-          <nav className="flex flex-wrap gap-x-4 gap-y-2 md:flex-col" aria-label="Admin">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm text-muted hover:text-ink">
-                {link.label}
-              </Link>
-            ))}
-            <Link href="/" className="text-sm text-muted hover:text-ink">
-              View site
-            </Link>
-          </nav>
+          <AdminNav links={links} />
           <form action={logout}>
-            <button type="submit" className="text-sm text-muted hover:text-ink">
+            <SubmitButton className="text-sm text-muted hover:text-ink" pendingLabel="Signing out…">
               Log out
-            </button>
+            </SubmitButton>
           </form>
         </aside>
         <div className="min-w-0">{children}</div>
