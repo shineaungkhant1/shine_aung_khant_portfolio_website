@@ -1,10 +1,21 @@
 import "server-only";
 import type { CertificationItem, EducationItem, ExperienceItem, Profile, Project } from "@/lib/data";
 
-export class ApiError extends Error {}
+export class ApiError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.status = status;
+  }
+}
 
 function base() {
-  return (process.env.API_URL ?? "http://localhost:8080").replace(/\/$/, "");
+  const url = (process.env.API_URL ?? "http://localhost:8080").replace(/\/$/, "");
+  if (process.env.NODE_ENV === "production" && !url.startsWith("https://")) {
+    throw new ApiError("Set API_URL to an https address.");
+  }
+  return url;
 }
 
 function authorization() {
@@ -35,7 +46,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (response.status === 204) return undefined as T;
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new ApiError(body?.error ?? `The API returned ${response.status}`);
+    throw new ApiError(body?.error ?? `The API returned ${response.status}`, response.status);
   }
   return (await response.json()) as T;
 }

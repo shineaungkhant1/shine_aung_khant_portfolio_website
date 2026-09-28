@@ -1,7 +1,8 @@
 import { createCertification, deleteCertification, updateCertification } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
-import { ApiError, apiGet, type ApiCertification } from "@/lib/portfolio-api";
+import { redirectOnApiError } from "@/lib/admin-problem";
+import { apiGet, type ApiCertification } from "@/lib/portfolio-api";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,7 @@ export default async function CertificationsAdminPage({
   try {
     items = await apiGet<ApiCertification[]>("/api/certifications");
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "The API could not be reached.";
-    return <p className="text-clay">{message}</p>;
+    redirectOnApiError(error);
   }
 
   return (

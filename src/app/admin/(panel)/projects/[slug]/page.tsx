@@ -3,6 +3,7 @@ import { deleteProject, updateProject } from "@/app/admin/actions";
 import { ProjectFields } from "@/components/admin/project-fields";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, primaryClass } from "@/components/admin/ui";
+import { redirectOnApiError } from "@/lib/admin-problem";
 import { ApiError, apiGet, type ApiProject } from "@/lib/portfolio-api";
 
 export const dynamic = "force-dynamic";
@@ -21,8 +22,7 @@ export default async function EditProjectPage({
     project = await apiGet<ApiProject>(`/api/projects/${slug}`);
   } catch (error) {
     if (error instanceof ApiError && error.message === "Project not found") notFound();
-    const message = error instanceof ApiError ? error.message : "The API could not be reached.";
-    return <p className="text-clay">{message}</p>;
+    redirectOnApiError(error);
   }
 
   return (

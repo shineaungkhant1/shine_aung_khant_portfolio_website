@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ApiError, apiGet, type ApiCertification, type ApiEducation, type ApiExperience, type ApiProject } from "@/lib/portfolio-api";
+import { redirectOnApiError } from "@/lib/admin-problem";
+import { apiGet, type ApiCertification, type ApiEducation, type ApiExperience, type ApiProject } from "@/lib/portfolio-api";
 
 export const dynamic = "force-dynamic";
 
@@ -38,12 +39,6 @@ export default async function AdminHomePage() {
       </div>
     );
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "The API could not be reached.";
-    return (
-      <div>
-        <h1 className="font-serif text-4xl tracking-tight">Overview</h1>
-        <p className="mt-4 max-w-xl text-clay">{message}</p>
-      </div>
-    );
+    redirectOnApiError(error);
   }
 }

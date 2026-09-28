@@ -1,7 +1,8 @@
 import { createEducation, deleteEducation, updateEducation } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
-import { ApiError, apiGet, type ApiEducation } from "@/lib/portfolio-api";
+import { redirectOnApiError } from "@/lib/admin-problem";
+import { apiGet, type ApiEducation } from "@/lib/portfolio-api";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,7 @@ export default async function EducationAdminPage({
   try {
     items = await apiGet<ApiEducation[]>("/api/education");
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "The API could not be reached.";
-    return <p className="text-clay">{message}</p>;
+    redirectOnApiError(error);
   }
 
   return (
