@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { WorkBrowser } from "@/components/work-browser";
-import { projects } from "@/lib/data";
+import { getProjects } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Work",
   description: "Flutter apps shipped by Shine Aung Khant for streaming, commerce, education, and delivery.",
 };
 
-export default function WorkPage() {
+export default async function WorkPage() {
+  const projects = await getProjects();
+
   return (
     <div className="mx-auto max-w-6xl px-5 pt-10 pb-14 sm:pt-14">
       <p className="enter text-xs tracking-[0.16em] text-muted uppercase">Work</p>

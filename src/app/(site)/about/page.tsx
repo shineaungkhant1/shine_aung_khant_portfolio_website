@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
 import { ContactSection } from "@/components/contact-section";
 import { DownloadIcon } from "@/components/icons";
-import { certifications, education, experience, profile, skillGroups } from "@/lib/data";
+import { skillGroups } from "@/lib/data";
+import { getCertifications, getEducation, getExperience, getProfile } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "About",
   description: "Experience, education, and skills of Flutter developer Shine Aung Khant.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [profile, experience, education, certifications] = await Promise.all([
+    getProfile(),
+    getExperience(),
+    getEducation(),
+    getCertifications(),
+  ]);
+
   return (
     <>
       <div className="mx-auto max-w-6xl px-5 py-14">

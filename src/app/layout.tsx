@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import Script from "next/script";
-import { BackgroundWash } from "@/components/background-wash";
-import { ResumePreview } from "@/components/resume-preview";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { profile } from "@/lib/data";
 import "./globals.css";
 
@@ -45,17 +41,7 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {themeScript}
         </Script>
-        <BackgroundWash />
-        <a
-          href="#content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-30 focus:bg-ink focus:px-3 focus:py-2 focus:text-paper"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="content">{children}</main>
-        <SiteFooter />
-        <ResumePreview />
+        {children}
       </body>
     </html>
   );

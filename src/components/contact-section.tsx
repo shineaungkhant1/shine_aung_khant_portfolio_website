@@ -1,6 +1,7 @@
-import { profile } from "@/lib/data";
+import { getProfile } from "@/lib/content";
 
-export function ContactSection() {
+export async function ContactSection() {
+  const profile = await getProfile();
   return (
     <section id="contact" className="reveal scroll-mt-24 border-t border-line">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:py-20 md:grid-cols-[1fr_1fr]">

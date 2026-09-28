@@ -4,9 +4,10 @@ import { HeroPortrait } from "@/components/hero-portrait";
 import { HeroScroll } from "@/components/hero-scroll";
 import { ArrowIcon, DownloadIcon } from "@/components/icons";
 import { ProjectCard } from "@/components/project-card";
-import { profile, projects } from "@/lib/data";
+import { getProfile, getProjects } from "@/lib/content";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
   const featured = projects.filter((project) => project.featured);
   const onAStore = projects.filter((project) => project.appStore || project.playStore).length;
 

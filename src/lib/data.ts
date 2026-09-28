@@ -1,3 +1,19 @@
+export type Profile = {
+  id?: number;
+  name: string;
+  role: string;
+  location: string;
+  origin: string;
+  email: string;
+  emailHref: string;
+  phone: string;
+  phoneHref: string;
+  linkedin: string;
+  github: string;
+  resume: string;
+  summary: string;
+};
+
 export const profile = {
   name: "Shine Aung Khant",
   role: "Flutter developer",
@@ -12,7 +28,7 @@ export const profile = {
   resume: "/Shine-Aung-Khant-Resume.pdf",
   summary:
     "Mid-level Flutter developer shipping Android and iOS apps for streaming, commerce, and education. I use Clean Architecture and BLoC, and I tune playback, images, and startup so the apps stay usable on low-end phones.",
-};
+} satisfies Profile;
 
 export type Category =
   | "Streaming"
@@ -21,6 +37,8 @@ export type Category =
   | "Delivery";
 
 export type Project = {
+  id?: number;
+  sortOrder?: number;
   slug: string;
   name: string;
   category: Category;
@@ -330,7 +348,17 @@ export function getProject(slug: string) {
   return projects.find((project) => project.slug === slug);
 }
 
-export const experience = [
+export type ExperienceItem = {
+  id?: number;
+  sortOrder?: number;
+  role: string;
+  org: string;
+  place: string;
+  period: string;
+  points: string[];
+};
+
+export const experience: ExperienceItem[] = [
   {
     role: "Mid Flutter Developer",
     org: "AXRA Tech",
@@ -387,7 +415,15 @@ export const experience = [
   },
 ];
 
-export const education = [
+export type EducationItem = {
+  id?: number;
+  sortOrder?: number;
+  title: string;
+  org: string;
+  period: string;
+};
+
+export const education: EducationItem[] = [
   {
     title: "UK BSc (Hons) Computer Science",
     org: "Strategy First International College",
@@ -405,7 +441,14 @@ export const education = [
   },
 ];
 
-export const certifications = [
+export type CertificationItem = {
+  id?: number;
+  sortOrder?: number;
+  title: string;
+  href: string;
+};
+
+export const certifications: CertificationItem[] = [
   {
     title: "Flutter Developer Certificate (A+)",
     href: "https://drive.google.com/drive/folders/1Mdl13YRT59k_RtjT4-Cq11rWFYNzIx5H",

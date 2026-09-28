@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { profile } from "@/lib/data";
 
 const links = [
   { href: "/work", label: "Work" },
@@ -12,7 +11,7 @@ const links = [
   { href: "/#contact", label: "Contact" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ resumeHref }: { resumeHref: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -160,7 +159,7 @@ export function SiteHeader() {
               );
             })}
             <a
-              href={profile.resume}
+              href={resumeHref}
               data-resume-preview
               className="relative py-1 transition-colors duration-200 hover:text-ink"
               onMouseEnter={(event) => placeBar(event.currentTarget)}
@@ -212,7 +211,7 @@ export function SiteHeader() {
               ))}
               <li>
                 <a
-                  href={profile.resume}
+                  href={resumeHref}
                   data-resume-preview
                   className="flex min-h-12 items-center"
                   onClick={() => {
