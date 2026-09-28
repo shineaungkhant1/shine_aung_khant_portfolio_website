@@ -4,7 +4,7 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn -B -DskipTests package
 
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17.0.16_8-jre
 WORKDIR /app
 COPY --from=build /app/target/portfolio-api.jar app.jar
 ENV SPRING_PROFILES_ACTIVE=prod
