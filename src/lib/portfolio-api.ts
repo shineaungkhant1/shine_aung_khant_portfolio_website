@@ -72,3 +72,12 @@ export type ApiProject = Project;
 export type ApiExperience = ExperienceItem;
 export type ApiEducation = EducationItem;
 export type ApiCertification = CertificationItem;
+
+export type ApiAnalyticsSummary = {
+  todayViews: number;
+  todayVisitors: number;
+  weekViews: number;
+  weekVisitors: number;
+  last7Days: { day: string; views: number; visitors: number }[];
+  topPages: { path: string; views: number; uniqueVisitors: number }[];
+};

@@ -2,6 +2,7 @@ import { BackgroundWash } from "@/components/background-wash";
 import { ResumePreview } from "@/components/resume-preview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { VisitorTracker } from "@/components/visitor-tracker";
 import { getProfile } from "@/lib/content";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="content">{children}</main>
       <SiteFooter />
       <ResumePreview />
+      <VisitorTracker />
     </>
   );
 }

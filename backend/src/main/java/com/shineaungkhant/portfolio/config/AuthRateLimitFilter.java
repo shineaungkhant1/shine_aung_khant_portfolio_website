@@ -46,7 +46,11 @@ class AuthRateLimitFilter extends OncePerRequestFilter {
   }
 
   private boolean limits(HttpServletRequest request) {
-    if (request.getRequestURI() == null || !request.getRequestURI().startsWith("/api/")) {
+    String uri = request.getRequestURI();
+    if (uri == null || !uri.startsWith("/api/")) {
+      return false;
+    }
+    if ("/api/analytics/pageview".equals(uri)) {
       return false;
     }
     String method = request.getMethod();
