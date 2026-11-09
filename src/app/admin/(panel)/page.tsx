@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader, Panel, primaryClass, secondaryClass } from "@/components/admin/ui";
+import { VisitorsChart } from "@/components/admin/visitors-chart";
 import { redirectOnApiError } from "@/lib/admin-problem";
 import {
   apiGet,
@@ -20,11 +21,6 @@ const emptyAnalytics: ApiAnalyticsSummary = {
   last7Days: [],
   topPages: [],
 };
-
-function formatDay(day: string) {
-  const date = new Date(`${day}T00:00:00Z`);
-  return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
-}
 
 export default async function AdminHomePage() {
   try {
@@ -64,8 +60,6 @@ export default async function AdminHomePage() {
       },
     ];
 
-    const maxViews = Math.max(1, ...analytics.last7Days.map((day) => day.views));
-
     return (
       <div className="grid gap-8">
         <PageHeader
@@ -98,26 +92,8 @@ export default async function AdminHomePage() {
             ))}
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div>
-              <p className="text-sm font-medium text-ink">Last 7 days</p>
-              <ul className="mt-4 grid gap-3">
-                {analytics.last7Days.map((day) => (
-                  <li key={day.day} className="grid grid-cols-[7rem_1fr_auto] items-center gap-3 text-sm">
-                    <span className="text-muted">{formatDay(day.day)}</span>
-                    <span className="h-2 overflow-hidden rounded-full bg-line">
-                      <span
-                        className="block h-full rounded-full bg-ink/80"
-                        style={{ width: `${Math.max(6, (day.views / maxViews) * 100)}%` }}
-                      />
-                    </span>
-                    <span className="min-w-16 text-right text-muted">
-                      {day.views} · {day.visitors}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
+            <VisitorsChart days={analytics.last7Days} />
 
             <div>
               <p className="text-sm font-medium text-ink">Top pages</p>
