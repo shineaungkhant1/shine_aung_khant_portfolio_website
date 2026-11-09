@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowIcon, DownloadIcon } from "@/components/icons";
 import { profile } from "@/lib/data";
 
@@ -89,10 +90,15 @@ const pages = [
 export function ResumePreview() {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"enter" | "next" | "prev">("enter");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -141,10 +147,10 @@ export function ResumePreview() {
     });
   }
 
-  if (!open) return null;
+  if (!mounted || !open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50">
+  return createPortal(
+    <div className="fixed inset-0 z-50 h-dvh overflow-hidden">
       <button
         type="button"
         aria-label="Close resume preview"
@@ -157,7 +163,7 @@ export function ResumePreview() {
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="relative flex h-full w-full flex-col px-4 py-4 outline-none sm:px-8"
+        className="relative flex h-full max-h-dvh w-full flex-col px-4 py-4 outline-none sm:px-8"
       >
         <div className={`flex w-full shrink-0 items-center justify-between text-paper ${shown ? "resume-backdrop is-in" : "resume-backdrop"}`}>
           <p id={titleId} className="font-serif text-2xl tracking-tight">
@@ -168,7 +174,7 @@ export function ResumePreview() {
           </button>
         </div>
         <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden py-4">
-          <div className={`resume-sheet relative flex h-full max-w-full items-center justify-center ${shown ? "is-in" : ""}`}>
+          <div className={`resume-sheet relative flex h-full max-h-full max-w-full items-center justify-center ${shown ? "is-in" : ""}`}>
             <div key={`${index}-${direction}`} className="relative max-h-full">
               <div aria-hidden="true" className="absolute inset-x-3 top-2 -bottom-2 rounded-sm bg-white/55 shadow-lg" />
               <img
@@ -225,6 +231,7 @@ export function ResumePreview() {
           </a>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

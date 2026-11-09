@@ -104,7 +104,8 @@ body {
   }
   to {
     opacity: 1;
-    translate: 0 0;
+    /* none, not 0 0: a retained translate traps position:fixed descendants. */
+    translate: none;
   }
 }
 
