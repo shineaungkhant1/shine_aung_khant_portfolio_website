@@ -16,7 +16,7 @@ public class PageDailyStat {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "stat_day", nullable = false)
   private LocalDate day;
 
   @Column(nullable = false, length = 300)

@@ -13,9 +13,9 @@ interface PageDailyStatRepository extends JpaRepository<PageDailyStat, Long> {
   @Query(
       value =
           """
-          insert into page_daily_stats (day, path, views, unique_visitors)
+          insert into page_daily_stats (stat_day, path, views, unique_visitors)
           values (:day, :path, 1, :uniqueIncrement)
-          on conflict (day, path) do update set
+          on conflict (stat_day, path) do update set
             views = page_daily_stats.views + 1,
             unique_visitors = page_daily_stats.unique_visitors + excluded.unique_visitors
           """,

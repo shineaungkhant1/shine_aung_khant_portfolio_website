@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class VisitorDaily {
 
   @Id
-  @Column(nullable = false)
+  @Column(name = "stat_day", nullable = false)
   private LocalDate day;
 
   @Id

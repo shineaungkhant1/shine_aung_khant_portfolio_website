@@ -1,6 +1,7 @@
 package com.shineaungkhant.portfolio.analytics;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ interface VisitorDailyRepository extends JpaRepository<VisitorDaily, VisitorDail
   @Query(
       value =
           """
-          insert into visitor_daily (day, visitor_hash)
+          insert into visitor_daily (stat_day, visitor_hash)
           values (:day, :visitorHash)
           on conflict do nothing
           """,
@@ -32,5 +33,5 @@ interface VisitorDailyRepository extends JpaRepository<VisitorDaily, VisitorDail
       where v.day between :from and :to
       group by v.day
       """)
-  java.util.List<Object[]> countByDay(@Param("from") LocalDate from, @Param("to") LocalDate to);
+  List<Object[]> countByDay(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

@@ -26,13 +26,9 @@ public class AnalyticsService {
   private final Clock clock;
 
   public AnalyticsService(PageDailyStatRepository pages, VisitorDailyRepository visitors) {
-    this(pages, visitors, Clock.systemUTC());
-  }
-
-  AnalyticsService(PageDailyStatRepository pages, VisitorDailyRepository visitors, Clock clock) {
     this.pages = pages;
     this.visitors = visitors;
-    this.clock = clock;
+    this.clock = Clock.systemUTC();
   }
 
   @Transactional
