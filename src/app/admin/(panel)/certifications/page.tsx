@@ -1,6 +1,16 @@
 import { createCertification, deleteCertification, updateCertification } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
-import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
+import {
+  Notice,
+  PageHeader,
+  Panel,
+  dangerClass,
+  fieldClass,
+  hintClass,
+  labelClass,
+  primaryClass,
+  secondaryClass,
+} from "@/components/admin/ui";
 import { redirectOnApiError } from "@/lib/admin-problem";
 import { apiGet, type ApiCertification } from "@/lib/portfolio-api";
 
@@ -20,28 +30,33 @@ export default async function CertificationsAdminPage({
   }
 
   return (
-    <div>
-      <h1 className="font-serif text-4xl tracking-tight">Certificates</h1>
-      <div className="mt-4">
-        <Notice saved={query.saved} error={query.error} />
-      </div>
-      <div className="mt-6 grid max-w-2xl gap-4">
-        <form action={createCertification} className="grid gap-3 rounded-[1.2rem] border border-line bg-card p-4">
+    <div className="grid gap-6">
+      <PageHeader title="Certificates" description="Credential titles and the links visitors open from the resume and about pages." />
+      <Notice saved={query.saved} error={query.error} />
+
+      <Panel title="Add certificate">
+        <form action={createCertification} className="grid gap-4">
           <label className={labelClass}>
             Title
             <input className={fieldClass} name="title" required />
           </label>
           <label className={labelClass}>
             Link
-            <input className={fieldClass} name="href" required />
+            <input className={fieldClass} name="href" required placeholder="https://" />
+            <span className={hintClass}>Use a public URL to the certificate or folder.</span>
           </label>
-          <SubmitButton className={primaryClass} pendingLabel="Adding…">
-            Add certificate
-          </SubmitButton>
+          <div>
+            <SubmitButton className={primaryClass} pendingLabel="Adding…">
+              Add certificate
+            </SubmitButton>
+          </div>
         </form>
+      </Panel>
+
+      <div className="grid gap-4">
         {items.map((item) => (
-          <div key={item.id} className="grid gap-3">
-            <form action={updateCertification} className="grid gap-3 rounded-[1.2rem] border border-line bg-card p-4">
+          <Panel key={item.id} title={item.title}>
+            <form action={updateCertification} className="grid gap-4">
               <input type="hidden" name="id" value={item.id} />
               <label className={labelClass}>
                 Title
@@ -51,17 +66,19 @@ export default async function CertificationsAdminPage({
                 Link
                 <input className={fieldClass} name="href" required defaultValue={item.href} />
               </label>
-              <SubmitButton className={secondaryClass} pendingLabel="Saving…">
-                Save
-              </SubmitButton>
+              <div>
+                <SubmitButton className={secondaryClass} pendingLabel="Saving…">
+                  Save
+                </SubmitButton>
+              </div>
             </form>
-            <form action={deleteCertification}>
+            <form action={deleteCertification} className="mt-4 border-t border-line pt-4">
               <input type="hidden" name="id" value={item.id} />
               <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this certificate?">
                 Delete
               </SubmitButton>
             </form>
-          </div>
+          </Panel>
         ))}
       </div>
     </div>

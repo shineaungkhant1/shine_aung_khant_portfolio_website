@@ -16,7 +16,7 @@ export function SubmitButton({
   const { pending } = useFormStatus();
   return (
     <button
-      className={`${className} disabled:cursor-wait disabled:opacity-60`}
+      className={className}
       type="submit"
       disabled={pending}
       aria-busy={pending}

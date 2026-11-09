@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { deleteProject, updateProject } from "@/app/admin/actions";
 import { ProjectFields } from "@/components/admin/project-fields";
 import { SubmitButton } from "@/components/admin/submit-button";
-import { Notice, dangerClass, primaryClass } from "@/components/admin/ui";
+import { BackLink, Notice, PageHeader, Panel, dangerClass, primaryClass } from "@/components/admin/ui";
 import { redirectOnApiError } from "@/lib/admin-problem";
 import { ApiError, apiGet, type ApiProject } from "@/lib/portfolio-api";
 
@@ -26,23 +26,37 @@ export default async function EditProjectPage({
   }
 
   return (
-    <div>
-      <h1 className="font-serif text-4xl tracking-tight">{project.name}</h1>
-      <div className="mt-4">
-        <Notice saved={query.saved} error={query.error} />
+    <div className="grid gap-6">
+      <div>
+        <BackLink href="/admin/projects">Projects</BackLink>
+        <div className="mt-4">
+          <PageHeader
+            title={project.name}
+            description={`${project.category} · ${project.org} · ${project.period}`}
+          />
+        </div>
       </div>
-      <form action={updateProject} className="mt-6 max-w-2xl">
-        <ProjectFields project={project} />
-        <SubmitButton className={`${primaryClass} mt-6`} pendingLabel="Saving…">
-          Save project
-        </SubmitButton>
+      <Notice saved={query.saved} error={query.error} />
+
+      <form action={updateProject} className="grid gap-5">
+        <Panel title="Project details">
+          <ProjectFields project={project} />
+        </Panel>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SubmitButton className={primaryClass} pendingLabel="Saving…">
+            Save project
+          </SubmitButton>
+        </div>
       </form>
-      <form action={deleteProject} className="mt-4">
-        <input type="hidden" name="slug" value={project.slug} />
-        <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this project?">
-          Delete project
-        </SubmitButton>
-      </form>
+
+      <Panel title="Danger zone" description="Deleting removes this project from the API and the public site.">
+        <form action={deleteProject}>
+          <input type="hidden" name="slug" value={project.slug} />
+          <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this project?">
+            Delete project
+          </SubmitButton>
+        </form>
+      </Panel>
     </div>
   );
 }

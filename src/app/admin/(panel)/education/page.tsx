@@ -1,6 +1,15 @@
 import { createEducation, deleteEducation, updateEducation } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
-import { Notice, dangerClass, fieldClass, labelClass, primaryClass, secondaryClass } from "@/components/admin/ui";
+import {
+  Notice,
+  PageHeader,
+  Panel,
+  dangerClass,
+  fieldClass,
+  labelClass,
+  primaryClass,
+  secondaryClass,
+} from "@/components/admin/ui";
 import { redirectOnApiError } from "@/lib/admin-problem";
 import { apiGet, type ApiEducation } from "@/lib/portfolio-api";
 
@@ -20,13 +29,12 @@ export default async function EducationAdminPage({
   }
 
   return (
-    <div>
-      <h1 className="font-serif text-4xl tracking-tight">Education</h1>
-      <div className="mt-4">
-        <Notice saved={query.saved} error={query.error} />
-      </div>
-      <div className="mt-6 grid max-w-2xl gap-4">
-        <form action={createEducation} className="grid gap-3 rounded-[1.2rem] border border-line bg-card p-4">
+    <div className="grid gap-6">
+      <PageHeader title="Education" description="Schools and programs listed on the public site." />
+      <Notice saved={query.saved} error={query.error} />
+
+      <Panel title="Add education">
+        <form action={createEducation} className="grid gap-4">
           <label className={labelClass}>
             Title
             <input className={fieldClass} name="title" required />
@@ -39,13 +47,18 @@ export default async function EducationAdminPage({
             Period
             <input className={fieldClass} name="period" required />
           </label>
-          <SubmitButton className={primaryClass} pendingLabel="Adding…">
-            Add education
-          </SubmitButton>
+          <div>
+            <SubmitButton className={primaryClass} pendingLabel="Adding…">
+              Add education
+            </SubmitButton>
+          </div>
         </form>
+      </Panel>
+
+      <div className="grid gap-4">
         {items.map((item) => (
-          <div key={item.id} className="grid gap-3">
-            <form action={updateEducation} className="grid gap-3 rounded-[1.2rem] border border-line bg-card p-4">
+          <Panel key={item.id} title={item.title} description={`${item.org} · ${item.period}`}>
+            <form action={updateEducation} className="grid gap-4">
               <input type="hidden" name="id" value={item.id} />
               <label className={labelClass}>
                 Title
@@ -59,17 +72,19 @@ export default async function EducationAdminPage({
                 Period
                 <input className={fieldClass} name="period" required defaultValue={item.period} />
               </label>
-              <SubmitButton className={secondaryClass} pendingLabel="Saving…">
-                Save
-              </SubmitButton>
+              <div>
+                <SubmitButton className={secondaryClass} pendingLabel="Saving…">
+                  Save
+                </SubmitButton>
+              </div>
             </form>
-            <form action={deleteEducation}>
+            <form action={deleteEducation} className="mt-4 border-t border-line pt-4">
               <input type="hidden" name="id" value={item.id} />
               <SubmitButton className={dangerClass} pendingLabel="Deleting…" confirmMessage="Delete this education?">
                 Delete
               </SubmitButton>
             </form>
-          </div>
+          </Panel>
         ))}
       </div>
     </div>

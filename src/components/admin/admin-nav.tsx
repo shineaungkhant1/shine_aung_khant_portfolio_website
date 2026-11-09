@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 
 export function AdminNav({ links }: { links: { href: string; label: string }[] }) {
   const pathname = usePathname();
+
   return (
-    <nav className="flex flex-wrap gap-x-4 gap-y-2 md:flex-col" aria-label="Admin">
+    <nav className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0" aria-label="Admin">
       {links.map((link) => {
         const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
         return (
@@ -14,15 +15,16 @@ export function AdminNav({ links }: { links: { href: string; label: string }[] }
             key={link.href}
             href={link.href}
             aria-current={active ? "page" : undefined}
-            className={active ? "text-sm text-ink" : "text-sm text-muted hover:text-ink"}
+            className={`shrink-0 rounded-full px-3.5 py-2 text-sm transition md:rounded-xl ${
+              active
+                ? "bg-ink text-paper"
+                : "text-muted hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-ink"
+            }`}
           >
             {link.label}
           </Link>
         );
       })}
-      <Link href="/" className="text-sm text-muted hover:text-ink">
-        View site
-      </Link>
     </nav>
   );
 }
